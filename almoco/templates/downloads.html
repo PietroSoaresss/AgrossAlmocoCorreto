@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download de Registros</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styleDownloads.css') }}">
+</head>
+<body>
+
+    <!-- Barra de Navegação -->
+    <div class="nav">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo">
+        </div>
+        <div class="menu">
+            <a href="/">Página Inicial</a>
+            <a href="/registros">Listar Registros</a>
+            <a href="/downloads">Baixar Registros</a>
+        </div>
+    </div>
+
+    <!-- Container central -->
+    <div class="container">
+        <img src="{{ url_for('static', filename='agrossLogo.png') }}" alt="Logo">
+        <h2>Download de Registros</h2>
+        <p>Escolha um período para baixar os registros.</p>
+
+        <label for="dataInicio">Data Inicial:</label>
+        <input type="date" id="dataInicio">
+        
+        <label for="dataFim">Data Final:</label>
+        <input type="date" id="dataFim">
+        
+        <button onclick="baixarRegistros()">Baixar Registros</button>
+        <p id="mensagem"></p>
+    </div>
+
+    <script>
+        function baixarRegistros() {
+    let dataInicio = document.getElementById("dataInicio").value;
+    let dataFim = document.getElementById("dataFim").value;
+
+    if (!dataInicio && !dataFim) {
+        document.getElementById("mensagem").innerText = "Por favor, selecione uma data ou um período.";
+        return;
+    }
+
+    // Se o usuário selecionar apenas uma data, usamos a mesma para início e fim
+    if (!dataFim) {
+        dataFim = dataInicio;
+    }
+    if (!dataInicio) {
+        dataInicio = dataFim;
+    }
+
+    if (dataInicio > dataFim) {
+        document.getElementById("mensagem").innerText = "A data inicial não pode ser maior que a data final.";
+        return;
+    }
+
+    window.location.href = `/download/csv?data_inicio=${dataInicio}&data_fim=${dataFim}`;
+}
+
+    </script>
+
+</body>
+</html>
