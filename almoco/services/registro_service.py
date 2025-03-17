@@ -30,22 +30,22 @@ def registrar_usuario(codigo, nome):
         if codigo not in USUARIOS_PERMITIDOS:
             return {"erro": "Usuário não autorizado!"}, 403
 
-        data_atual = datetime.now().replace(microsecond=0)  # Remove os milissegundos
+        data_atual = datetime.now().replace(microsecond=0)  
 
         # Verifica se já existe um registro no mesmo dia
         registro_existente = Registro.query.filter(
             Registro.codigo == codigo,
-            db.func.date(Registro.data_hora) == data_atual.date()  # Verifica apenas pela data, sem hora
+            db.func.date(Registro.data_hora) == data_atual.date()  
         ).first()
 
         if registro_existente:
             return {"erro": "Usuário já registrado hoje!"}, 403
 
-        # Criando um novo registro com data e hora exata (sem microsegundos)
+        
         novo_registro = Registro(
             codigo=codigo,
             nome=nome,
-            data_hora=data_atual  # Agora a data/hora será salva corretamente sem milissegundos
+            data_hora=data_atual  
         )
         db.session.add(novo_registro)
 
