@@ -3,7 +3,6 @@ import io
 import csv
 from models import Registro, db
 from flask import current_app
-import json
 
 # Lista de códigos permitidos (substitua pelos códigos corretos)
 USUARIOS_PERMITIDOS = {
@@ -19,8 +18,7 @@ USUARIOS_PERMITIDOS = {
 }  # Exemplo de códigos autor
 
 
-with open('usuarios_permitidos.json', 'r') as f:
-    USUARIOS_PERMITIDOS = json.load(f)
+
 
 def registrar_usuario(codigo, nome):
     with current_app.app_context():  # Garante que estamos dentro do contexto do Flask
