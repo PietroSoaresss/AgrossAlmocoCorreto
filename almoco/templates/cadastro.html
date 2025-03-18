@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Usuário</title>
+    <title>Registro de Almoço</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styleMain.css') }}">
 </head>
 <body>
 
-    <!-- Barra de Navegação -->
     <div class="nav">
         <div class="logo">
             <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo">
@@ -17,70 +16,39 @@
             <a href="/">Página Inicial</a>
             <a href="/registros">Listar Registros</a>
             <a href="/downloads">Baixar Registros</a>
-            <a href="/registros">Cadastrar Usuários</a>
+            <a href="/registrar">Cadastrar Usuário</a>
         </div>
     </div>
 
     <div class="container">
-        <!-- Logo na parte de cadastro -->
         <img src="{{ url_for('static', filename='agrossLogo.png') }}" alt="Logo" class="logo-registro">
 
-        <h2>Cadastro de Usuário</h2>
-        <form id="formCadastro">
-            <input type="text" id="nome" placeholder="Digite o nome do usuário" required>
-            <button type="submit">Cadastrar</button>
-        </form>
+        <h2>Registro de Almoço</h2>
+        <input type="text" id="codigo" placeholder="Escaneie ou digite o código">
+        <button onclick="enviarCodigo()">Registrar</button>
         <p id="mensagem"></p>
     </div>
 
     <script>
-        // Função para gerar um código aleatório
-        function gerarCodigo(length = 5) {
-            const caracteres = '0123456789';
-            let codigo = '';
-            for (let i = 0; i < length; i++) {
-                codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-            }
-            return codigo;
-        }
-
-        // Capturar o envio do formulário
-        document.getElementById('formCadastro').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Previne o envio tradicional do formulário
-
-            const nome = document.getElementById('nome').value;
-            if (!nome) {
-                document.getElementById('mensagem').innerText = 'Por favor, insira um nome.';
+        async function enviarCodigo() {
+            const codigo = document.getElementById("codigo").value.trim();
+            if (!codigo) {
+                document.getElementById("mensagem").textContent = "Por favor, digite um código válido!";
                 return;
             }
 
-            // Gerar código aleatório para o usuário
-            const codigo = gerarCodigo();
-
-            // Enviar os dados para o backend via POST
-            const resposta = await fetch('/cadastro', {
-                method: 'POST',
+            const response = await fetch("/registrar", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    nome: nome,
-                    codigo: codigo
-                }),
+                body: JSON.stringify({ codigo: codigo })
             });
 
-            const data = await resposta.json();
-
-            if (resposta.ok) {
-                document.getElementById('mensagem').innerText = `Usuário ${nome} cadastrado com sucesso! Código: ${codigo}`;
-                document.getElementById('nome').value = ''; // Limpar campo de nome
-            } else {
-                document.getElementById('mensagem').innerText = `Erro: ${data.erro}`;
-            }
-        });
+            const data = await response.json();
+            document.getElementById("mensagem").textContent = data.mensagem || data.erro;
+        }
     </script>
 
 </body>
 </html>
-
-

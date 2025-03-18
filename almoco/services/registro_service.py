@@ -1,28 +1,20 @@
+# filepath: c:\Users\PietroTI\Documents\workspace\almoco\services\registro_service.py
 from datetime import datetime, timedelta
 import io
 import csv
-from models import Registro, db
+from models import Registro, db, UsuarioPermitido
 from flask import current_app
 
-# Lista de códigos permitidos (substitua pelos códigos corretos)
-USUARIOS_PERMITIDOS = {
-    '11111':'Pietro Soares',
-    '22222':'Maria Silva',
-    '12345':'João Silva',
-    '54321':'Marcos Martins',
-    '33333':'Pedro Soares',
-    '44444':'Ana Silva',
-    
-
-    
-}  # Exemplo de códigos autor
-
-
-
+def carregar_usuarios_permitidos():
+    usuarios = UsuarioPermitido.query.all()
+    return {usuario.codigo: usuario.nome for usuario in usuarios}
 
 def registrar_usuario(codigo, nome):
     with current_app.app_context():  # Garante que estamos dentro do contexto do Flask
         
+        # Carrega a lista de usuários permitidos
+        USUARIOS_PERMITIDOS = carregar_usuarios_permitidos()
+
         # Verifica se o usuário está na lista permitida
         if codigo not in USUARIOS_PERMITIDOS:
             return {"erro": "Usuário não autorizado!"}, 403
@@ -50,7 +42,6 @@ def registrar_usuario(codigo, nome):
         except Exception as e:
             db.session.rollback()
             return {"erro": str(e)}, 500
-
 
 def gerar_csv(data_inicio, data_fim):
     try:
@@ -98,3 +89,26 @@ def gerar_csv(data_inicio, data_fim):
 
     except ValueError:
         return None, "Formato de data inválido. Utilize o formato YYYY-MM-DD."
+    
+
+    def cadastrar_usuario_permitido(codigo, nome):
+        with current_app.app_context():
+            usuario_existente = UsuarioPermitido.query.filter_by(codigo=codigo).first()
+
+        if usuario_existente:
+            return {"erro": "Usuário já cadastrado!"}, 400
+
+        novo_usuario = UsuarioPermitido(codigo=codigo, nome=nome)
+        db.session.add(novo_usuario)
+
+        try:
+            db.session.commit()
+            return {"mensagem": f"Usuário {nome} (Código: {codigo}) cadastrado com sucesso!"}, 201
+        except Exception as e:
+            db.session.rollback()
+            return {"erro": str(e)}, 500
+
+
+def cadastro_usuarios():
+    usuarios = UsuarioPermitido.query.all()
+    return {usuario.codigo: usuario.nome for usuario in usuarios}

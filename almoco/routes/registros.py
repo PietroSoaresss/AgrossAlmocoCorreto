@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template, flash
 from services.registro_service import registrar_usuario
-from models import Registro
+from models import Registro, UsuarioPermitido
 from datetime import datetime
 from sqlalchemy import func
 
@@ -86,3 +86,27 @@ def registros():
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
+    
+
+
+registros_bp = Blueprint("registros", __name__)
+
+@registros_bp.route("/")
+def index():
+    return render_template("index.html")
+
+@registros_bp.route("/registrar", methods=["POST"])
+def registrar():
+    data = request.json
+    codigo = data.get("codigo")
+
+    if not codigo:
+        return jsonify({"erro": "Código é obrigatório!"}), 400
+
+    # Busca o nome do usuário permitido pelo código
+    usuario = UsuarioPermitido.query.filter_by(codigo=codigo).first()
+
+    if not usuario:
+        return jsonify({"erro": "Usuário não autorizado!"}), 403
+
+    return jsonify(registrar_usuario(codigo, usuario.nome))
