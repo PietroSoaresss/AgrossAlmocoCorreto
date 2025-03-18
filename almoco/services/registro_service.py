@@ -3,25 +3,24 @@ import io
 import csv
 from models import Registro, db
 from flask import current_app
-from models import db
-
+import json
 
 # Lista de códigos permitidos (substitua pelos códigos corretos)
 USUARIOS_PERMITIDOS = {
-    
     '11111':'Pietro Soares',
     '22222':'Maria Silva',
     '12345':'João Silva',
     '54321':'Marcos Martins',
-    '33333':'Pedro Soares'
+    '33333':'Pedro Soares',
+    '44444':'Ana Silva',
     
+
     
-}  # Exemplo de códigos autorizados
+}  # Exemplo de códigos autor
 
-from datetime import datetime
-from flask import current_app
-from models import Registro, db
 
+with open('usuarios_permitidos.json', 'r') as f:
+    USUARIOS_PERMITIDOS = json.load(f)
 
 def registrar_usuario(codigo, nome):
     with current_app.app_context():  # Garante que estamos dentro do contexto do Flask
@@ -31,17 +30,15 @@ def registrar_usuario(codigo, nome):
             return {"erro": "Usuário não autorizado!"}, 403
 
         data_atual = datetime.now().replace(microsecond=0)  
-
-        # Verifica se já existe um registro no mesmo dia
+        # Verifica se já existe um registro no mesmo dia com o mesmo código
         registro_existente = Registro.query.filter(
             Registro.codigo == codigo,
-            db.func.date(Registro.data_hora) == data_atual.date()  
+            db.func.date(Registro.data_hora) == data_atual.date()
         ).first()
 
         if registro_existente:
             return {"erro": "Usuário já registrado hoje!"}, 403
 
-        
         novo_registro = Registro(
             codigo=codigo,
             nome=nome,

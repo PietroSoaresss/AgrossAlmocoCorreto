@@ -34,6 +34,7 @@ body {
 }
 .nav .menu a:hover {
     color: #45c237;
+    border-bottom: 2px solid #45c237;
 }
 
 .container {
